@@ -65,16 +65,16 @@
 | PK Table      | Cardinality PK Table | FK Table             | Cardinality FK Table | Relationship |
 | ------------- | -------------------- | -------------------- | -------------------- | ------------ |
 | shippers      | Zero-or-One          | orders               |  One-or-Many         | One-to-Many  |
-| employees     |                      | orders               |                      |              |
-| employees     |                      | employees            |                      |              |
-| employees     | -                    | territories          | -                    |              |
-| customers     |                      | orders               |                      |              |
-| customers     | -                    | customerdemographics | -                    |              |
-| orders        |                      | orderdetails         |                      |              |
-| products      |                      | orderdetails         |                      |              |
-| suppliers     |                      | products             |                      |              |
-| categories    |                      | products             |                      |              |
-| region        |                      | territories          |                      |              |
+| employees     | Zero-or-One          | orders               |  One-or-Many         | One-to-Many  |
+| employees     | Zero-or-One          | employees            |  One-or-Many         | One-to-Many  |
+| employees     | -                    | territories          | -                    | Many-to-Many |
+| customers     | Zero-or-One          | orders               |  One-or-Many         | One-to-Many  |
+| customers     | -                    | customerdemographics | -                    | Many-to-Many |
+| orders        | One-and-Only-One     | orderdetails         |  One-or-Many         | One-to-One   |
+| products      | One-and-Only-One     | orderdetails         |  One-or-Many         | One-to-One   |
+| suppliers     | Zero-or-One          | products             |  One-or-Many         | One-to-Many  |
+| categories    | Zero-or-One          | products             |  One-or-Many         | One-to-Many  |
+| region        | One-and-Only-One     | territories          |  One-or-Many         | One-to-Many  |
 
 4. Выясните тип отношений между таблицами базы данных. Заполните колонку Relationship в таблице выше. Используйте статью [Many-to-Many Relationship in the Northwind database](http://blog.codeontime.com/2012/04/many-to-many-relationship-in-northwind.html), чтобы найти связи типа "многие-ко-многим".
 
@@ -87,21 +87,22 @@
 
 1. Создайте в Postman новую коллекцию с именем Northwind, в этой коллекции создайте такие запросы к [Northwind OData Service](https://services.odata.org/V3/Northwind/Northwind.svc/), которые будут удовлетворять описанию из таблицы ниже. После проверки запроса, занесите необходимые параметры в таблицу:
 
-| Query Description                                                 | HTTP Verb | Url                        |
-| ----------------------------------------------------------------- | --------- | -------------------------- |
-| Get service metadata.                                             | GET       | /$metadata                 |
-| Get all customers.                                                |           |                            |
-| Get a customer with "ALFKI" id.                                   |           |                            |
-| Get all orders.                                                   |           |                            |
-| Get an order with "10248" id.                                     |           |                            |
-| Get all orders for a customer with "ANATR" id.                    |           |                            |
-| Get a customer for an order with "10248" id.                      |           |                            |
-| Get a customer for an order with "10248" id.                      |           |                            |
-| Get all customers from Germany.                                   |           |                            |
-| Get all orders shipped to France in 1997.                         |           |                            |
-| Get all products with units in stock less than 20.                |           |                            |
-| Get all orders shipped by company "Speedy Express".               |           |                            |
-| Get all orders shipped to UK with employees.                      |           |                            |
+| Query Description                                                 | HTTP Verb | Url                                                    |
+| ----------------------------------------------------------------- | --------- | -------------------------------------------------------|
+| Get service metadata.                                             | GET       | /$metadata                                             |
+| Get all customers.                                                | GET       | /Customers                                             |
+| Get a customer with "ALFKI" id.                                   | GET       | /Customers('ALFKI')                                    |
+| Get all orders.                                                   | GET       | /Customers/Orders                                      |
+| Get an order with "10248" id.                                     | GET       | /Customers/Orders(10248)                               |
+| Get all orders for a customer with "ANATR" id.                    | GET       | /Customers('ANATR')/Orders                             |
+| Get a customer for an order with "10248" id.                      | GET       | /Orders(10248)/CustomerID                              |
+| Get a customer for an order with "10248" id.                      | GET       | /Orders(10248)/CustomerID                              |
+| Get all customers from Germany.                                   | GET       | /Customers?$filter=Country eq 'Germany'                |
+| Get all orders shipped to France in 1997.                         | GET       | /Orders?$filter=ShipCountry eq 'France'                |                                       |                                                                   |           | and ShippedDate ge DateTime'1997-01-01'                |
+|                                                                   |           | and ShippedDate le DateTime'1997-12-31'                |
+| Get all products with units in stock less than 20.                | GET       | /Products?$filter=UnitsInStock le 20                   |
+| Get all orders shipped by company "Speedy Express".               | GET       | /Shippers(1)?$expand=Orders                            |
+| Get all orders shipped to UK with employees.                      | GET       | /Employees?$expand=Orders($filter=ShipCountry eq 'UK') |
 
 Создайте самостоятельно еще минимум 5 сложных запросов и запишите их в таблицу.
 
